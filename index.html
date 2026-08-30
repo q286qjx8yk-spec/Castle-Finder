@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Castle Finder -- UK Castle Travel Map</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#faf6ee">
+<link rel="icon" href="icons/icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<button type="button" id="sidebar-toggle" aria-label="Toggle sidebar">&#9776;</button>
+
+<div id="sidebar">
+  <h1>Castle Finder</h1>
+  <p class="subtitle">Explore and plan visits to castles across England, Scotland, Wales &amp; Northern Ireland.</p>
+
+  <div id="search-controls">
+    <input type="text" id="search-input" placeholder="Search castles by name...">
+  </div>
+
+  <div id="filter-controls">
+    <div class="filter-group">
+      <label class="filter-toggle-row">
+        <input type="checkbox" id="notable-toggle" checked>
+        <span>Notable only (has a photo)</span>
+      </label>
+    </div>
+
+    <div class="filter-group">
+      <h2 class="filter-group-title">Country</h2>
+      <div id="filter-country" class="filter-checkbox-list">
+        <label class="filter-checkbox-row">
+          <input type="checkbox" data-country="England" checked>
+          <span class="legend-dot" style="background: var(--country-england)"></span>
+          <span>England</span>
+        </label>
+        <label class="filter-checkbox-row">
+          <input type="checkbox" data-country="Scotland" checked>
+          <span class="legend-dot" style="background: var(--country-scotland)"></span>
+          <span>Scotland</span>
+        </label>
+        <label class="filter-checkbox-row">
+          <input type="checkbox" data-country="Wales" checked>
+          <span class="legend-dot" style="background: var(--country-wales)"></span>
+          <span>Wales</span>
+        </label>
+        <label class="filter-checkbox-row">
+          <input type="checkbox" data-country="Northern Ireland" checked>
+          <span class="legend-dot" style="background: var(--country-ni)"></span>
+          <span>Northern Ireland</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <h2 class="filter-group-title">Condition</h2>
+      <div id="filter-condition" class="filter-checkbox-list">
+        <label class="filter-checkbox-row">
+          <input type="checkbox" data-condition="Ruins" checked>
+          <span>Ruins</span>
+        </label>
+        <label class="filter-checkbox-row">
+          <input type="checkbox" data-condition="Intact" checked>
+          <span>Intact</span>
+        </label>
+        <label class="filter-checkbox-row">
+          <input type="checkbox" data-condition="Unknown" checked>
+          <span>Unknown</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <h2 class="filter-group-title">Managed by</h2>
+      <div id="filter-managed" class="filter-checkbox-list filter-checkbox-list-scroll">
+        <label class="filter-checkbox-row">
+          <input type="checkbox" data-managed="English Heritage" checked>
+          <span>English Heritage</span>
+        </label>
+        <label class="filter-checkbox-row">
+          <input type="checkbox" data-managed="National Trust" checked>
+          <span>National Trust</span>
+        </label>
+        <label class="filter-checkbox-row">
+          <input type="checkbox" data-managed="Cadw" checked>
+          <span>Cadw</span>
+        </label>
+        <label class="filter-checkbox-row">
+          <input type="checkbox" data-managed="Historic Environment Scotland" checked>
+          <span>Historic Environment Scotland</span>
+        </label>
+        <label class="filter-checkbox-row">
+          <input type="checkbox" data-managed="Historic Royal Palaces" checked>
+          <span>Historic Royal Palaces</span>
+        </label>
+        <label class="filter-checkbox-row">
+          <input type="checkbox" data-managed="Historic Environment Division (NI)" checked>
+          <span>Historic Environment Division (NI)</span>
+        </label>
+        <label class="filter-checkbox-row">
+          <input type="checkbox" data-managed="Royal Household" checked>
+          <span>Royal Household</span>
+        </label>
+        <label class="filter-checkbox-row">
+          <input type="checkbox" data-managed="Local Council" checked>
+          <span>Local Council</span>
+        </label>
+        <label class="filter-checkbox-row">
+          <input type="checkbox" data-managed="Independent" checked>
+          <span>Independent</span>
+        </label>
+        <label class="filter-checkbox-row">
+          <input type="checkbox" data-managed="null" checked>
+          <span>Unlisted / independent</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div id="trip-panel"></div>
+
+  <div id="results-count"></div>
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="app.js"></script>
+<script src="trip.js"></script>
+</body>
+</html>

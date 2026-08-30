@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "castle-finder",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd '/Users/joshdavis/Desktop/Projects/Castle Finder' && exec python3 -m http.server 8420"],
+      "port": 8420
+    }
+  ]
+}
