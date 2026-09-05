@@ -262,6 +262,45 @@ window.CastleApp.markersById = window.CastleApp.markersById || new Map();
     window.CastleApp.markerClusterGroup = markerClusterGroup;
   }
 
+  // Supports linking straight to one castle (e.g. from a YouTube video
+  // description) via ?castle=<id>, instead of dropping the visitor on the
+  // generic whole-UK view. Forces the marker into the cluster group first
+  // in case the current filters (e.g. notable-only) would otherwise hide
+  // it, so the link always resolves to something visible.
+  function openCastleFromQuery() {
+    var app = window.CastleApp;
+    try {
+      var params = new URLSearchParams(location.search);
+      var id = params.get("castle");
+      if (!id) return;
+
+      var castle = app.castles.find(function (c) {
+        return c.id === id;
+      });
+      var marker = app.markersById.get(id);
+      if (!castle || !marker) return;
+
+      if (!app.markerClusterGroup.hasLayer(marker)) {
+        app.markerClusterGroup.addLayer(marker);
+      }
+
+      // Jump straight to a fixed, individual-marker-level zoom rather than
+      // using markercluster's zoomToShowLayer -- calling that immediately
+      // on page load races with the cluster group's own initial layout
+      // pass and can leave the callback never firing. A plain setView +
+      // "moveend" is reliable here because MarkerClusterGroup registers
+      // its own zoomend/moveend handling during init, earlier than this
+      // listener, so its declustering has already happened by the time
+      // this callback runs.
+      app.map.setView([castle.lat, castle.lon], 14);
+      app.map.once("moveend", function () {
+        marker.openPopup();
+      });
+    } catch (e) {
+      /* ignore malformed query string */
+    }
+  }
+
   function init() {
     initMap();
     wireFilterControls();
@@ -286,6 +325,7 @@ window.CastleApp.markersById = window.CastleApp.markersById || new Map();
         });
 
         window.CastleApp.applyFilters();
+        openCastleFromQuery();
       })
       .catch(function (err) {
         console.error("Castle Finder: failed to load castle data", err);
