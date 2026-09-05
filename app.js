@@ -86,6 +86,13 @@ window.CastleApp.markersById = window.CastleApp.markersById || new Map();
     );
     parts.push('</div>');
 
+    parts.push('<div class="castle-popup-share">');
+    parts.push(
+      '<button type="button" class="btn-copy-link" data-castle-id="' +
+      escapeHtml(castle.id) + '">🔗 Copy Link to This Castle</button>'
+    );
+    parts.push('</div>');
+
     parts.push('</div>'); // castle-popup-body
     parts.push('</div>'); // castle-popup
 
@@ -264,9 +271,16 @@ window.CastleApp.markersById = window.CastleApp.markersById || new Map();
 
   // Supports linking straight to one castle (e.g. from a YouTube video
   // description) via ?castle=<id>, instead of dropping the visitor on the
-  // generic whole-UK view. Forces the marker into the cluster group first
-  // in case the current filters (e.g. notable-only) would otherwise hide
-  // it, so the link always resolves to something visible.
+  // generic whole-UK view. Opens a standalone L.popup rather than the
+  // marker's own bound popup: asking MarkerClusterGroup to reveal one
+  // specific marker (via zoomToShowLayer, or a manual zoom + the marker's
+  // own openPopup()) is racy immediately after the initial bulk addLayer
+  // call on page load -- its internal declustering can lag well behind
+  // the "moveend" that following a setView fires, silently leaving the
+  // marker unrendered. A standalone popup sidesteps that entirely, and
+  // still gets full button behavior because trip.js's click handling is
+  // delegated on document (matched by class + data-castle-id), not bound
+  // to this particular marker instance.
   function openCastleFromQuery() {
     var app = window.CastleApp;
     try {
@@ -277,25 +291,13 @@ window.CastleApp.markersById = window.CastleApp.markersById || new Map();
       var castle = app.castles.find(function (c) {
         return c.id === id;
       });
-      var marker = app.markersById.get(id);
-      if (!castle || !marker) return;
+      if (!castle) return;
 
-      if (!app.markerClusterGroup.hasLayer(marker)) {
-        app.markerClusterGroup.addLayer(marker);
-      }
-
-      // Jump straight to a fixed, individual-marker-level zoom rather than
-      // using markercluster's zoomToShowLayer -- calling that immediately
-      // on page load races with the cluster group's own initial layout
-      // pass and can leave the callback never firing. A plain setView +
-      // "moveend" is reliable here because MarkerClusterGroup registers
-      // its own zoomend/moveend handling during init, earlier than this
-      // listener, so its declustering has already happened by the time
-      // this callback runs.
       app.map.setView([castle.lat, castle.lon], 14);
-      app.map.once("moveend", function () {
-        marker.openPopup();
-      });
+      L.popup({ maxWidth: 300, autoPan: true })
+        .setLatLng([castle.lat, castle.lon])
+        .setContent(buildPopupHtml(castle))
+        .openOn(app.map);
     } catch (e) {
       /* ignore malformed query string */
     }

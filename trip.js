@@ -338,6 +338,26 @@ window.CastleApp.visited = window.CastleApp.visited || new Set();
     updateRouteLine();
   }
 
+  function copyCastleLink(id) {
+    var url = location.origin + location.pathname + "?castle=" + encodeURIComponent(id);
+
+    function announce() {
+      window.CastleApp.showToast("Link copied!");
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard
+        .writeText(url)
+        .then(announce)
+        .catch(function (err) {
+          console.error("Castle Finder: failed to copy castle link", err);
+          announce();
+        });
+    } else {
+      announce();
+    }
+  }
+
   function shareTrip() {
     var app = window.CastleApp;
     var url = location.origin + location.pathname + "?trip=" + app.trip.join(",");
@@ -393,6 +413,13 @@ window.CastleApp.visited = window.CastleApp.visited || new Set();
           toggleTrip(addId);
           updateAddTripButtonText(addBtn, window.CastleApp.trip.indexOf(addId) !== -1);
         }
+        return;
+      }
+
+      var copyLinkBtn = target.closest(".btn-copy-link");
+      if (copyLinkBtn) {
+        var linkId = copyLinkBtn.getAttribute("data-castle-id");
+        if (linkId) copyCastleLink(linkId);
         return;
       }
 
