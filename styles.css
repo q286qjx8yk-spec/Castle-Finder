@@ -402,6 +402,29 @@ body {
   color: #fff;
 }
 
+.castle-popup .castle-popup-share {
+  margin-top: 2px;
+}
+
+.castle-popup .btn-copy-link {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1.5px dashed var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.castle-popup .btn-copy-link:hover {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
 /* ---------- Trip Planner ---------- */
 
 .trip-list {
